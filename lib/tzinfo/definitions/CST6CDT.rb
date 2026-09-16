@@ -8,15 +8,12 @@ module TZInfo
       timezone 'CST6CDT' do |tz|
         tz.offset :o0, -21600, 0, :CST
         tz.offset :o1, -21600, 3600, :CDT
-        tz.offset :o2, -21600, 3600, :CWT
-        tz.offset :o3, -21600, 3600, :CPT
         
         tz.transition 1918, 3, :o1, 14530103, 6
         tz.transition 1918, 10, :o0, 58125451, 24
         tz.transition 1919, 3, :o1, 14532287, 6
         tz.transition 1919, 10, :o0, 58134187, 24
-        tz.transition 1942, 2, :o2, 14582399, 6
-        tz.transition 1945, 8, :o3, 58360379, 24
+        tz.transition 1942, 2, :o1, 14582399, 6
         tz.transition 1945, 9, :o0, 58361491, 24
         tz.transition 1967, 4, :o1, 14637665, 6
         tz.transition 1967, 10, :o0, 58555027, 24

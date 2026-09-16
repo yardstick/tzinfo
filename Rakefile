@@ -3,9 +3,9 @@
 # rake test - Runs all test cases.
 # rake package - Runs test cases and builds packages for distribution.
 # rake rdoc - Builds API documentation in doc dir.
-# rake build_tz_modules - Builds Timezone modules and the Country index. 
+# rake build_tz_modules - Builds Timezone modules and the Country index.
 #   Expects to find source data in ../data.
-# rake build_tz_module zone=Zone/Name - Builds a single Timezone module. 
+# rake build_tz_module zone=Zone/Name - Builds a single Timezone module.
 #   Expects to find source data in ../data.
 # rake build_countries - Builds the Country index.
 #   Expects to find source data in ../data.
@@ -15,6 +15,10 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'fileutils'
+
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.8')
+  load 'lib/forward_ports/rake_package_task.rb'
+end
 
 Rake::TaskManager.class_eval do
   def remove_task(task_name)
@@ -33,9 +37,9 @@ def sh(*cmd, &block)
   if cmd.first =~ /\A__tar_with_owner__ -?([zjcvf]+)(.*)\z/
     opts = $1
     args = $2
-    cmd[0] = "tar c --owner 0 --group 0 -#{opts.gsub('c', '')}#{args}"    
+    cmd[0] = "tar c --owner 0 --group 0 -#{opts.gsub('c', '')}#{args}"
   end
-  
+
   orig_sh(*cmd, &block)
 end
 
@@ -43,6 +47,7 @@ end
 BUILD_TZ_CLASSES_DIR = 'lib/tzinfo.build_tz_classes'
 
 SPEC = eval(File.read('tzinfo.gemspec'))
+
 
 package_task = Rake::GemPackageTask.new(SPEC) do |pkg|
   pkg.need_zip = true
@@ -82,7 +87,7 @@ file "#{package_task.package_dir}/#{package_task.gem_file}" => [package_task.pac
     chdir(package_task.package_dir_path) do
       Gem::Builder.new(package_task.gem_spec).build
     end
-    
+
     verbose(true) do
       mv File.join(package_task.package_dir_path, package_task.gem_file), "#{package_task.package_dir}/#{package_task.gem_file}"
     end
@@ -106,20 +111,20 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "TZInfo"
   rdoc.options << '--inline-source'
   rdoc.options.concat SPEC.rdoc_options
-  rdoc.rdoc_files.include(*SPEC.extra_rdoc_files) 
-  rdoc.rdoc_files.include('lib')  
+  rdoc.rdoc_files.include(*SPEC.extra_rdoc_files)
+  rdoc.rdoc_files.include('lib')
 end
 
 task :build_tz_modules do
   require 'lib/tzinfo/tzdataparser'
-  
+
   FileUtils.mkdir_p(BUILD_TZ_CLASSES_DIR)
-  begin  
+  begin
     p = TZInfo::TZDataParser.new('data', BUILD_TZ_CLASSES_DIR)
     p.execute
-    
+
     scm = Scm.create(File.dirname(__FILE__))
-    
+
     ['indexes', 'definitions'].each do |dir|
       scm.sync("#{BUILD_TZ_CLASSES_DIR}/#{dir}", "lib/tzinfo/#{dir}")
     end
@@ -152,11 +157,11 @@ class Scm
   def exec_scm(params)
     puts "#{command} #{params}"
     `#{command} #{params}`
-    raise "#{command} exited with status #$?" if $? != 0  
+    raise "#{command} exited with status #$?" if $? != 0
   end
 
   private
-  
+
   def sync_dirs(source_dir, target_dir)
     # Assumes a directory will never turn into a file and vice-versa
     # (files will all end in .rb, directories won't).
@@ -164,34 +169,34 @@ class Scm
     source_entries, target_entries = [source_dir, target_dir].collect do |dir|
       Dir.entries(dir).delete_if {|entry| entry =~ /\A\./}.sort
     end
-    
-    until source_entries.empty? || target_entries.empty?          
+
+    until source_entries.empty? || target_entries.empty?
       last_source = source_entries.last
       last_target = target_entries.last
-    
+
       if last_source == last_target
         source_file = File.join(source_dir, last_source)
         target_file = File.join(target_dir, last_target)
-      
+
         if File.directory?(source_file)
           sync_dirs(source_file, target_file)
         else
           FileUtils.cp(source_file, target_file)
-        end     
-      
+        end
+
         source_entries.pop
         target_entries.pop
       elsif source_entries.last < target_entries.last
         sync_only_in_target(target_dir, target_entries)
-      else      
+      else
         sync_only_in_source(source_dir, target_dir, source_entries)
-      end    
+      end
     end
-    
+
     until target_entries.empty?
       sync_only_in_target(target_dir, target_entries)
     end
-    
+
     until source_entries.empty?
       sync_only_in_source(source_dir, target_dir, source_entries)
     end
@@ -206,7 +211,7 @@ class Scm
   def sync_only_in_source(source_dir, target_dir, source_entries)
     source_file = File.join(source_dir, source_entries.last)
     target_file = File.join(target_dir, source_entries.last)
-        
+
     if File.directory?(source_file)
       Dir.mkdir(target_file)
       add(target_file)
@@ -215,7 +220,7 @@ class Scm
       FileUtils.cp(source_file, target_file)
       add(target_file)
     end
-    
+
     source_entries.pop
   end
 end
@@ -224,10 +229,10 @@ class NullScm < Scm
   def command
     nil
   end
-  
+
   def add(file)
   end
-  
+
   def delete(file)
     puts "rm -rf \"#{file}\""
     FileUtils.rm_rf(file)
@@ -238,13 +243,13 @@ class GitScm < Scm
   def command
     'git'
   end
-  
+
   def add(file)
     unless File.directory?(file)
       exec_scm "add \"#{file}\""
     end
   end
-  
+
   def delete(file)
     exec_scm "rm -rf \"#{file}\""
   end
@@ -254,11 +259,11 @@ class SvnScm < Scm
   def command
     'svn'
   end
-  
+
   def add(file)
     exec_scm "add \"#{file}\""
   end
-  
+
   def delete(file)
     exec_scm "delete --force \"#{file}\""
   end

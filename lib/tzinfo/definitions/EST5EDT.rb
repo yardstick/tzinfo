@@ -8,15 +8,12 @@ module TZInfo
       timezone 'EST5EDT' do |tz|
         tz.offset :o0, -18000, 0, :EST
         tz.offset :o1, -18000, 3600, :EDT
-        tz.offset :o2, -18000, 3600, :EWT
-        tz.offset :o3, -18000, 3600, :EPT
         
         tz.transition 1918, 3, :o1, 58120411, 24
         tz.transition 1918, 10, :o0, 9687575, 4
         tz.transition 1919, 3, :o1, 58129147, 24
         tz.transition 1919, 10, :o0, 9689031, 4
-        tz.transition 1942, 2, :o2, 58329595, 24
-        tz.transition 1945, 8, :o3, 58360379, 24
+        tz.transition 1942, 2, :o1, 58329595, 24
         tz.transition 1945, 9, :o0, 9726915, 4
         tz.transition 1967, 4, :o1, 58550659, 24
         tz.transition 1967, 10, :o0, 9759171, 4

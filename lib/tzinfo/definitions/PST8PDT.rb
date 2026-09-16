@@ -8,15 +8,12 @@ module TZInfo
       timezone 'PST8PDT' do |tz|
         tz.offset :o0, -28800, 0, :PST
         tz.offset :o1, -28800, 3600, :PDT
-        tz.offset :o2, -28800, 3600, :PWT
-        tz.offset :o3, -28800, 3600, :PPT
         
         tz.transition 1918, 3, :o1, 29060207, 12
         tz.transition 1918, 10, :o0, 19375151, 8
         tz.transition 1919, 3, :o1, 29064575, 12
         tz.transition 1919, 10, :o0, 19378063, 8
-        tz.transition 1942, 2, :o2, 29164799, 12
-        tz.transition 1945, 8, :o3, 58360379, 24
+        tz.transition 1942, 2, :o1, 29164799, 12
         tz.transition 1945, 9, :o0, 19453831, 8
         tz.transition 1967, 4, :o1, 29275331, 12
         tz.transition 1967, 10, :o0, 19518343, 8
