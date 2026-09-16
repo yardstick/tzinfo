@@ -8,15 +8,12 @@ module TZInfo
       timezone 'MST7MDT' do |tz|
         tz.offset :o0, -25200, 0, :MST
         tz.offset :o1, -25200, 3600, :MDT
-        tz.offset :o2, -25200, 3600, :MWT
-        tz.offset :o3, -25200, 3600, :MPT
         
         tz.transition 1918, 3, :o1, 19373471, 8
         tz.transition 1918, 10, :o0, 14531363, 6
         tz.transition 1919, 3, :o1, 19376383, 8
         tz.transition 1919, 10, :o0, 14533547, 6
-        tz.transition 1942, 2, :o2, 19443199, 8
-        tz.transition 1945, 8, :o3, 58360379, 24
+        tz.transition 1942, 2, :o1, 19443199, 8
         tz.transition 1945, 9, :o0, 14590373, 6
         tz.transition 1967, 4, :o1, 19516887, 8
         tz.transition 1967, 10, :o0, 14638757, 6
